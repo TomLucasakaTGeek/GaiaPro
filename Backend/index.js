@@ -1,32 +1,38 @@
 const express = require('express');
-const OpenAI = require('openai');
-require('dotenv').config();
+const http = require('http');
+const socketIo = require('socket.io');
+const axios = require('axios');
 
 const app = express();
+const server = http.createServer(app);
+const io = socketIo(server);
+
 app.use(express.json());
 
-const openai = new OpenAI({
-  apiKey: process.env.OPENAI_API_KEY,
+io.on('connection', (socket) => {
+  console.log('New client connected');
+
+  socket.on('sendMessage', async (message) => {
+    try {
+      const response = await axios.post('https://YOUR-NODE-ID.gaianet.network/v1/chat/completions', {
+        messages: [
+          { role: 'system', content: 'You are a helpful assistant.' },
+          { role: 'user', content: message }
+        ],
+        model: 'model_name'
+      });
+
+      const reply = response.data.choices[0].message.content;
+      io.emit('receiveMessage', reply);
+    } catch (error) {
+      console.error('Error:', error);
+    }
+  });
+
+  socket.on('disconnect', () => {
+    console.log('Client disconnected');
+  });
 });
 
-app.post('/chat', async (req, res) => {
-  try {
-    const { message } = req.body;
-    
-    const completion = await openai.chat.completions.create({
-      model: "gpt-3.5-turbo",
-      messages: [{ role: "user", content: message }],
-    });
-
-    res.json({ reply: completion.choices[0].message.content });
-  } catch (error) {
-    console.error('Error:', error);
-    res.status(500).json({ error: 'An error occurred while processing your request.' });
-  }
-});
-
-const PORT = process.env.PORT || 3000;
-app.listen(PORT, () => {
-  console.log(`Server is running on port ${PORT}`);
-});
-
+const PORT = process.env.PORT || 4000;
+server.listen(PORT, () => console.log(`Server running on port ${PORT}`));
