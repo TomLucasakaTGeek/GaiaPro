@@ -13,9 +13,8 @@ app.get('/query', async (req, res) => {
     const userMessage = req.query.message;
 
     // Send the message to the API
-    const response = await axios.post('https://codestral.us.gaianet.network/v1/chat/completions', {
+    const response = await axios.post('https://llama3.us.gaianet.network/v1/chat/completions', {
       messages: [
-        { role: 'system', content: 'You are a helpful assistant.' },
         { role: 'user', content: userMessage }
       ]
     }, {
