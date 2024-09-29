@@ -3,6 +3,7 @@ const http = require('http');
 const socketIo = require('socket.io');
 const axios = require('axios');
 
+require('dotenv').config()
 const app = express();
 const server = http.createServer(app);
 const io = socketIo(server);
@@ -14,7 +15,8 @@ io.on('connection', (socket) => {
 
   socket.on('sendMessage', async (message) => {
     try {
-      const response = await axios.post('https://YOUR-NODE-ID.gaianet.network/v1/chat/completions', {
+      const response = await axios.post(process.env.KEY
+        , {
         messages: [
           { role: 'system', content: 'You are a helpful assistant.' },
           { role: 'user', content: message }
