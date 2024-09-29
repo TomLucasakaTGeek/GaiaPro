@@ -1,5 +1,5 @@
 import React from 'react';
-import QueryComponent from './QueryComponent';
+import QueryComponent from './querycomp.jsx';
 
 const App = () => {
   return (

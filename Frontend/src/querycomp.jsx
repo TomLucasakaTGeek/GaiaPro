@@ -4,10 +4,13 @@ import axios from 'axios';
 const QueryComponent = () => {
   const [response, setResponse] = useState('');
   const [error, setError] = useState('');
+  const [message, setMessage] = useState('');
 
   const handleQuery = async () => {
     try {
-      const res = await axios.post('http://localhost:3000/query');
+      const res = await axios.get('http://localhost:8003/query', {
+        params: { message }
+      });
       setResponse(res.data);
       setError('');
     } catch (err) {
@@ -19,6 +22,12 @@ const QueryComponent = () => {
 
   return (
     <div>
+      <input
+        type="text"
+        value={message}
+        onChange={(e) => setMessage(e.target.value)}
+        placeholder="Enter your message"
+      />
       <button onClick={handleQuery}>Send Query</button>
       {response && <div><strong>Response:</strong> {JSON.stringify(response)}</div>}
       {error && <div style={{ color: 'red' }}>{error}</div>}

@@ -2,16 +2,21 @@ const express = require('express');
 const axios = require('axios');
 
 const app = express();
-const port = 8003;
+const port = 8003; // Updated port value
 
 app.use(express.json());
 
-app.post('/query', async (req, res) => {
+// GET route to handle the request from the React component
+app.get('/query', async (req, res) => {
   try {
+    // Extract the message from the query parameters
+    const userMessage = req.query.message;
+
+    // Send the message to the API
     const response = await axios.post('https://codestral.us.gaianet.network/v1/chat/completions', {
       messages: [
         { role: 'system', content: 'You are a helpful assistant.' },
-        { role: 'user', content: 'Where is Paris?' }
+        { role: 'user', content: userMessage }
       ]
     }, {
       headers: {
@@ -20,6 +25,7 @@ app.post('/query', async (req, res) => {
       }
     });
 
+    // Send the API response back to the client
     res.json(response.data);
   } catch (error) {
     console.error(error);
