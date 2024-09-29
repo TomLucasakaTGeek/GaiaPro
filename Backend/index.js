@@ -1,40 +1,32 @@
 const express = require('express');
-const http = require('http');
-const socketIo = require('socket.io');
 const axios = require('axios');
 
-require('dotenv').config()
 const app = express();
-const server = http.createServer(app);
-const io = socketIo(server);
+const port = 8003;
 
 app.use(express.json());
 
-io.on('connection', (socket) => {
-  console.log('New client connected');
+app.post('/query', async (req, res) => {
+  try {
+    const response = await axios.post('https://codestral.us.gaianet.network/v1/chat/completions', {
+      messages: [
+        { role: 'system', content: 'You are a helpful assistant.' },
+        { role: 'user', content: 'Where is Paris?' }
+      ]
+    }, {
+      headers: {
+        'accept': 'application/json',
+        'Content-Type': 'application/json'
+      }
+    });
 
-  socket.on('sendMessage', async (message) => {
-    try {
-      const response = await axios.post(process.env.KEY
-        , {
-        messages: [
-          { role: 'system', content: 'You are a helpful assistant.' },
-          { role: 'user', content: message }
-        ],
-        model: 'model_name'
-      });
-
-      const reply = response.data.choices[0].message.content;
-      io.emit('receiveMessage', reply);
-    } catch (error) {
-      console.error('Error:', error);
-    }
-  });
-
-  socket.on('disconnect', () => {
-    console.log('Client disconnected');
-  });
+    res.json(response.data);
+  } catch (error) {
+    console.error(error);
+    res.status(500).send('Something went wrong!');
+  }
 });
 
-const PORT = process.env.PORT || 4000;
-server.listen(PORT, () => console.log(`Server running on port ${PORT}`));
+app.listen(port, () => {
+  console.log(`Server is running on http://localhost:${port}`);
+});
