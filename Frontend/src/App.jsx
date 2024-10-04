@@ -1,11 +1,12 @@
 import React from 'react';
-import QueryComponent from './querycomp.jsx';
+import QueryComponent from './components/querycomp';
+import DropzoneComponent from './components/dragndrop';
 
 const App = () => {
   return (
-    <div>
-      <h1>Query LLM</h1>
-      <QueryComponent />
+    <div className='App'>
+      <h1>Drag and Drop File Upload</h1>
+      <DropzoneComponent/>
     </div>
   );
 };
